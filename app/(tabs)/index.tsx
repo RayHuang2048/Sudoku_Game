@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, SafeAreaView, Alert, Text } from 'react-native';
+import { View, StyleSheet, SafeAreaView, Alert, Text, BackHandler } from 'react-native';
 import { Board } from '@/components/Board';
 import { NumberPad } from '@/components/NumberPad';
 import { Controls } from '@/components/Controls';
@@ -62,6 +62,13 @@ export default function SudokuGame() {
     setGrid(resetGrid);
   };
 
+  const handleExit = () => {
+    Alert.alert('Exit Game', 'Are you sure you want to exit?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Exit', onPress: () => BackHandler.exitApp() },
+    ]);
+  };
+
   const checkCompletion = (currentGrid: Grid) => {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
@@ -86,10 +93,11 @@ export default function SudokuGame() {
         <Board
           grid={grid}
           initialGrid={initialGrid}
+          solvedGrid={solvedGrid}
           selectedCell={selectedCell}
           onCellPress={handleCellPress}
         />
-        <Controls onNewGame={startNewGame} onReset={handleReset} />
+        <Controls onNewGame={startNewGame} onReset={handleReset} onExit={handleExit} />
         <NumberPad onNumberPress={handleNumberPress} onDelete={handleDelete} />
       </View>
     </SafeAreaView>

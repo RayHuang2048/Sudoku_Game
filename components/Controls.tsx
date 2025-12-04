@@ -5,9 +5,10 @@ import { Colors } from '../constants/Colors';
 interface ControlsProps {
     onNewGame: () => void;
     onReset: () => void;
+    onExit: () => void;
 }
 
-export const Controls: React.FC<ControlsProps> = ({ onNewGame, onReset }) => {
+export const Controls: React.FC<ControlsProps> = ({ onNewGame, onReset, onExit }) => {
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.button} onPress={onNewGame}>
@@ -15,6 +16,9 @@ export const Controls: React.FC<ControlsProps> = ({ onNewGame, onReset }) => {
             </TouchableOpacity>
             <TouchableOpacity style={[styles.button, styles.resetButton]} onPress={onReset}>
                 <Text style={[styles.text, styles.resetText]}>Reset</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, styles.exitButton]} onPress={onExit}>
+                <Text style={[styles.text, styles.exitText]}>Exit</Text>
             </TouchableOpacity>
         </View>
     );
@@ -30,7 +34,7 @@ const styles = StyleSheet.create({
     },
     button: {
         paddingVertical: 12,
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         backgroundColor: Colors.primary,
         borderRadius: 25,
         elevation: 3,
@@ -41,6 +45,9 @@ const styles = StyleSheet.create({
         borderColor: Colors.primary,
         elevation: 0,
     },
+    exitButton: {
+        backgroundColor: '#E74C3C', // Red color for exit
+    },
     text: {
         color: '#FFF',
         fontSize: 16,
@@ -48,5 +55,8 @@ const styles = StyleSheet.create({
     },
     resetText: {
         color: Colors.primary,
+    },
+    exitText: {
+        color: '#FFF',
     },
 });
