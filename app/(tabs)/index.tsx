@@ -3,14 +3,17 @@ import { View, StyleSheet, SafeAreaView, Alert, Text, BackHandler } from 'react-
 import { Board } from '@/components/Board';
 import { NumberPad } from '@/components/NumberPad';
 import { Controls } from '@/components/Controls';
+import { ConfettiAnimation } from '@/components/ConfettiAnimation';
 import { generateSudoku, Grid } from '@/utils/sudoku';
 import { Colors } from '@/constants/Colors';
+import { initializeSound, playClickSound, cleanupSound } from '@/utils/sound';
 
 export default function SudokuGame() {
   const [grid, setGrid] = useState<Grid>([]);
   const [initialGrid, setInitialGrid] = useState<Grid>([]);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
   const [solvedGrid, setSolvedGrid] = useState<Grid>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const startNewGame = useCallback(() => {
     const { initialGrid: newInitial, solvedGrid: newSolved } = generateSudoku('medium');
@@ -20,10 +23,18 @@ export default function SudokuGame() {
     setGrid(newGrid);
     setSolvedGrid(newSolved);
     setSelectedCell(null);
+    setShowConfetti(false);
   }, []);
 
   useEffect(() => {
     startNewGame();
+    // 初始化音效
+    initializeSound();
+    
+    // 清理音效資源
+    return () => {
+      cleanupSound();
+    };
   }, [startNewGame]);
 
   const handleCellPress = (row: number, col: number) => {
@@ -36,6 +47,9 @@ export default function SudokuGame() {
 
     // Cannot edit initial cells
     if (initialGrid[row][col] !== null) return;
+
+    // 播放點擊音效
+    playClickSound();
 
     const newGrid = [...grid];
     newGrid[row] = [...newGrid[row]];
@@ -77,9 +91,14 @@ export default function SudokuGame() {
         }
       }
     }
-    Alert.alert('Congratulations!', 'You solved the Sudoku!', [
-      { text: 'New Game', onPress: startNewGame },
-    ]);
+    // 觸發拉炮動畫
+    setShowConfetti(true);
+    // 延遲顯示恭喜訊息，讓動畫先播放
+    setTimeout(() => {
+      Alert.alert('恭喜！', '您成功解開了數獨！', [
+        { text: '新遊戲', onPress: startNewGame },
+      ]);
+    }, 500);
   };
 
   if (grid.length === 0) return null;
@@ -100,6 +119,10 @@ export default function SudokuGame() {
         <Controls onNewGame={startNewGame} onReset={handleReset} onExit={handleExit} />
         <NumberPad onNumberPress={handleNumberPress} onDelete={handleDelete} />
       </View>
+      <ConfettiAnimation 
+        visible={showConfetti} 
+        onComplete={() => setShowConfetti(false)} 
+      />
     </SafeAreaView>
   );
 }
